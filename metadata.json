@@ -1,0 +1,5 @@
+{
+  "name": "Spanish Accent Challenge",
+  "description": "A visually engaging game to help users practice placing Spanish orthographic accents. The game presents sentences with a missing accent, and the player must identify the correct word and vowel to place the accent on.",
+  "requestFramePermissions": []
+}
