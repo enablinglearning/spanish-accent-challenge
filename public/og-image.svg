@@ -1,0 +1,37 @@
+<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f172a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0c4a6e;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  
+  <!-- Title -->
+  <text x="600" y="250" font-family="Arial, sans-serif" font-size="72" font-weight="bold" fill="#ffffff" text-anchor="middle">
+    Acentúa la Frase
+  </text>
+  
+  <!-- Subtitle -->
+  <text x="600" y="320" font-family="Arial, sans-serif" font-size="36" fill="#cbd5e1" text-anchor="middle">
+    Spanish Accent Challenge
+  </text>
+  
+  <!-- Description -->
+  <text x="600" y="400" font-family="Arial, sans-serif" font-size="28" fill="#94a3b8" text-anchor="middle">
+    Juego interactivo para practicar las tildes
+  </text>
+  
+  <!-- Accent mark decoration -->
+  <text x="600" y="500" font-family="Arial, sans-serif" font-size="120" fill="#60a5fa" text-anchor="middle" opacity="0.6">
+    á é í ó ú
+  </text>
+  
+  <!-- Bottom text -->
+  <text x="600" y="580" font-family="Arial, sans-serif" font-size="24" fill="#64748b" text-anchor="middle">
+    enablinglearning.com
+  </text>
+</svg>
+
