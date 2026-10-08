@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "validate": "node scripts/validate-bank.mjs",
+    "build": "node scripts/validate-bank.mjs && vite build",
     "preview": "vite preview"
   },
   "dependencies": {

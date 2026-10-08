@@ -10,7 +10,7 @@ const Attribution: React.FC<AttributionProps> = ({ showBTLPTLink = false, classN
     <div className={`text-center ${className}`}>
       {showBTLPTLink && (
         <p className="text-sm text-slate-400 mb-3">
-          ¿Buscas recursos para prepararte para exámenes de competencia en español académico como el BTLPT?{' '}
+          ¿Te preparas para un examen de dominio del español académico, como el BTLPT?{' '}
           <a 
             href="https://www.enablinglearning.com/btlpt/" 
             target="_blank" 
@@ -22,7 +22,7 @@ const Attribution: React.FC<AttributionProps> = ({ showBTLPTLink = false, classN
         </p>
       )}
       <p className="text-xs text-slate-500">
-        Este juego ha sido diseñado por{' '}
+        Juego creado por{' '}
         <a 
           href="https://www.enablinglearning.com/" 
           target="_blank" 

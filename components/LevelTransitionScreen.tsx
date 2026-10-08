@@ -14,12 +14,12 @@ const LevelTransitionScreen: React.FC<LevelTransitionScreenProps> = ({ level, sc
        <div className="flex justify-center items-center gap-4 mb-4">
         <SparklesIcon className="w-12 h-12 text-yellow-400"/>
         <h1 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-cyan-300">
-            ¡Nivel {level} Completado!
+            ¡Nivel {level} completado!
         </h1>
        </div>
       <p className="text-xl text-slate-300 mb-6">¡Buen trabajo! Prepárate para el siguiente nivel.</p>
       <div className="my-8">
-        <p className="text-lg text-slate-400">Puntuación Actual</p>
+        <p className="text-lg text-slate-400">Puntuación actual</p>
         <div className="flex justify-center items-center gap-4 text-6xl font-bold text-yellow-400 mt-2">
           <StarIcon className="w-16 h-16"/>
           <span>{score}</span>

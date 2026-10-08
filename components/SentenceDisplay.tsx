@@ -16,6 +16,17 @@ const ACCENTED_VOWELS: { [key: string]: string } = {
 
 const VOWELS = 'aeiouAEIOU';
 
+/**
+ * Applies the accent from `withAccent` onto `word`, keeping the word's own
+ * capitalization (e.g. "Tu" + "tú" -> "Tú").
+ */
+const applyAccent = (word: string, withAccent: string): string => {
+  const accented = Array.from(withAccent.toLowerCase());
+  return Array.from(word).map((char, i) =>
+    accented[i] !== char.toLowerCase() && ACCENTED_VOWELS[char] ? ACCENTED_VOWELS[char] : char
+  ).join('');
+};
+
 const SentenceDisplay: React.FC<SentenceDisplayProps> = ({ sentence, wordsToAccent, onCorrect, onAttemptFailed, showHint }) => {
   const [selectedWordIndex, setSelectedWordIndex] = useState<number | null>(null);
   const [foundWords, setFoundWords] = useState<string[]>([]);
@@ -56,7 +67,9 @@ const SentenceDisplay: React.FC<SentenceDisplayProps> = ({ sentence, wordsToAcce
 
     const correctTarget = wordsToAccent.find(w => w.withoutAccent.toLowerCase() === word.toLowerCase());
 
-    if (correctTarget && attemptedWord === correctTarget.withAccent) {
+    // Case-insensitive: a capitalized word in the sentence ("Tu") must still
+    // match a lowercase answer key ("tú").
+    if (correctTarget && attemptedWord.toLowerCase() === correctTarget.withAccent.toLowerCase()) {
         const newFoundWords = [...foundWords, correctTarget.withoutAccent.toLowerCase()];
         setFoundWords(newFoundWords);
         setSelectedWordIndex(null);
@@ -73,9 +86,13 @@ const SentenceDisplay: React.FC<SentenceDisplayProps> = ({ sentence, wordsToAcce
   };
 
   const getInstructionText = () => {
-    if (isAnswered) return "Ronda completada. ¡Espera el feedback!";
+    if (isAnswered) return "¡Ronda completada! Lee la explicación.";
     if (selectedWordIndex !== null) return "Ahora, haz clic en la vocal correcta para añadir la tilde.";
-    if (showHint) return "Pista: La palabra que necesita la tilde está brillando. ¡Inténtalo de nuevo!";
+    if (showHint) {
+      return wordsToAccent.length - foundWords.length > 1
+        ? "Pista: las palabras que necesitan tilde están parpadeando. ¡Inténtalo de nuevo!"
+        : "Pista: la palabra que necesita tilde está parpadeando. ¡Inténtalo de nuevo!";
+    }
     
     if (foundWords.length > 0) {
       const remaining = wordsToAccent.length - foundWords.length;
@@ -107,10 +124,10 @@ const SentenceDisplay: React.FC<SentenceDisplayProps> = ({ sentence, wordsToAcce
           const isHinted = showHint && !isFound && !isSelected && targetWordsWithoutAccent.includes(cleanWord.toLowerCase());
 
           if (isFound) {
-            const correctVersion = wordsToAccent.find(w => w.withoutAccent.toLowerCase() === cleanWord.toLowerCase())?.withAccent || cleanWord;
+            const target = wordsToAccent.find(w => w.withoutAccent.toLowerCase() === cleanWord.toLowerCase());
+            const correctVersion = target ? applyAccent(cleanWord, target.withAccent) : cleanWord;
             return (
                  <span key={wordIdx} className="inline-block mr-2 p-2 rounded-md bg-green-500/20 text-green-300 font-bold">
-                    {/* FIX: Corrected typo from trailingPuncuation to trailingPunctuation */}
                     {leadingPunctuation}{correctVersion}{trailingPunctuation}
                  </span>
             )

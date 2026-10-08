@@ -9,6 +9,8 @@ import { LogoutIcon, WarningIcon } from './icons';
 interface GameScreenProps {
   level: number;
   sentences: GameRound[];
+  initialSentenceIndex: number;
+  onRoundResolved: (nextSentenceIndex: number) => void;
   score: number;
   lives: number;
   onLevelComplete: () => void;
@@ -32,7 +34,7 @@ const QuitConfirmModal: React.FC<QuitConfirmModalProps> = ({ onConfirm, onCancel
                         ¿Salir del juego?
                     </h2>
                     <p className="mt-4 text-slate-300">
-                        Perderás el progreso y tendrás que empezar de nuevo. Tu puntuación no se guardará.
+                        Perderás tu progreso y tendrás que empezar de nuevo.
                     </p>
                     <div className="mt-8 w-full flex gap-4">
                          <button 
@@ -54,8 +56,8 @@ const QuitConfirmModal: React.FC<QuitConfirmModalProps> = ({ onConfirm, onCancel
     );
 };
 
-const GameScreen: React.FC<GameScreenProps> = ({ level, sentences, score, lives, onLevelComplete, onCorrectAnswer, onIncorrectAnswer, onQuit }) => {
-  const [currentSentenceIndex, setCurrentSentenceIndex] = useState(0);
+const GameScreen: React.FC<GameScreenProps> = ({ level, sentences, initialSentenceIndex, onRoundResolved, score, lives, onLevelComplete, onCorrectAnswer, onIncorrectAnswer, onQuit }) => {
+  const [currentSentenceIndex, setCurrentSentenceIndex] = useState(initialSentenceIndex);
   const [feedback, setFeedback] = useState<{ correct: boolean; explanation: string } | null>(null);
   const [showQuitConfirm, setShowQuitConfirm] = useState(false);
   const [tries, setTries] = useState(3);
@@ -104,8 +106,9 @@ const GameScreen: React.FC<GameScreenProps> = ({ level, sentences, score, lives,
   const handleCorrectAnswer = useCallback(() => {
     playSound('correct');
     onCorrectAnswer();
+    onRoundResolved(currentSentenceIndex + 1);
     setFeedback({ correct: true, explanation: sentences[currentSentenceIndex].explanation });
-  }, [onCorrectAnswer, sentences, currentSentenceIndex]);
+  }, [onCorrectAnswer, onRoundResolved, sentences, currentSentenceIndex]);
 
   const handleAttemptFailed = useCallback(() => {
     if (feedback || tries <= 0) return;
@@ -117,9 +120,10 @@ const GameScreen: React.FC<GameScreenProps> = ({ level, sentences, score, lives,
 
     if (newTries <= 0) {
       onIncorrectAnswer();
+      onRoundResolved(currentSentenceIndex + 1);
       setFeedback({ correct: false, explanation: sentences[currentSentenceIndex].explanation });
     }
-  }, [feedback, tries, onIncorrectAnswer, sentences, currentSentenceIndex]);
+  }, [feedback, tries, onIncorrectAnswer, onRoundResolved, sentences, currentSentenceIndex]);
 
   const nextSentence = useCallback(() => {
     setFeedback(null);
@@ -137,6 +141,11 @@ const GameScreen: React.FC<GameScreenProps> = ({ level, sentences, score, lives,
 
   const currentSentence = sentences[currentSentenceIndex];
   const showHint = tries === 1 && !feedback;
+
+  // A game saved right after the level's last sentence resumes past the end of the level.
+  useEffect(() => {
+    if (!currentSentence && sentences.length > 0) onLevelComplete();
+  }, [currentSentence, sentences.length, onLevelComplete]);
 
   if (!currentSentence) {
     return (

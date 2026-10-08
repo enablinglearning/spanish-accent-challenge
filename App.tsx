@@ -20,6 +20,28 @@ function shuffleArray<T>(array: T[]): T[] {
 
 const SENTENCES_PER_LEVEL = 10;
 const TOTAL_LEVELS = 6;
+const POINTS_PER_SENTENCE = 10;
+const MAX_SCORE = SENTENCES_PER_LEVEL * TOTAL_LEVELS * POINTS_PER_SENTENCE;
+
+// Bumped when the word bank changes so stale saved games (with old rounds) are discarded.
+const SAVE_KEY = 'accentuateGameState_v2';
+
+/**
+ * Orders the bank from easiest to hardest (fewer target words, then shorter
+ * sentence), splits it into one tier per level, and shuffles within each tier,
+ * so levels get progressively harder while each game still varies.
+ */
+function buildLevels(bank: GameRound[]): GameRound[] {
+  const sorted = [...bank].sort((a, b) =>
+    a.wordsToAccent.length - b.wordsToAccent.length ||
+    a.sentence.split(' ').length - b.sentence.split(' ').length
+  );
+  const rounds: GameRound[] = [];
+  for (let level = 0; level < TOTAL_LEVELS; level++) {
+    rounds.push(...shuffleArray(sorted.slice(level * SENTENCES_PER_LEVEL, (level + 1) * SENTENCES_PER_LEVEL)));
+  }
+  return rounds;
+}
 
 const App: React.FC = () => {
   const [gameState, setGameState] = useState<GameState>(GameState.Start);
@@ -27,6 +49,10 @@ const App: React.FC = () => {
   const [lives, setLives] = useState(3);
   const [allRounds, setAllRounds] = useState<GameRound[]>([]);
   const [currentLevel, setCurrentLevel] = useState(0);
+  const [won, setWon] = useState(false);
+  // Next unresolved sentence within the current level; saved so a resumed game
+  // continues where it left off instead of replaying (and re-scoring) sentences.
+  const [sentenceIndex, setSentenceIndex] = useState(0);
 
   // State for saved game and high score
   const [savedGame, setSavedGame] = useState<any | null>(null);
@@ -35,7 +61,8 @@ const App: React.FC = () => {
   // Load saved game and high score on initial mount
   useEffect(() => {
     try {
-      const savedState = localStorage.getItem('accentuateGameState');
+      localStorage.removeItem('accentuateGameState'); // pre-v2 save format
+      const savedState = localStorage.getItem(SAVE_KEY);
       if (savedState) {
         setSavedGame(JSON.parse(savedState));
       }
@@ -45,7 +72,7 @@ const App: React.FC = () => {
       }
     } catch (error) {
       console.error("Failed to load game state from localStorage", error);
-      localStorage.removeItem('accentuateGameState');
+      localStorage.removeItem(SAVE_KEY);
       localStorage.removeItem('accentuateHighScore');
     }
   }, []);
@@ -53,12 +80,12 @@ const App: React.FC = () => {
   // Effect to save game progress
   useEffect(() => {
     if (gameState === GameState.Playing || gameState === GameState.LevelTransition) {
-      const stateToSave = { gameState, score, lives, allRounds, currentLevel };
-      localStorage.setItem('accentuateGameState', JSON.stringify(stateToSave));
+      const stateToSave = { gameState, score, lives, allRounds, currentLevel, sentenceIndex };
+      localStorage.setItem(SAVE_KEY, JSON.stringify(stateToSave));
     } else {
-      localStorage.removeItem('accentuateGameState');
+      localStorage.removeItem(SAVE_KEY);
     }
-  }, [gameState, score, lives, allRounds, currentLevel]);
+  }, [gameState, score, lives, allRounds, currentLevel, sentenceIndex]);
 
   // Effect to update high score
   useEffect(() => {
@@ -72,9 +99,10 @@ const App: React.FC = () => {
 
 
   const startGame = useCallback(() => {
-    const shuffledRounds = shuffleArray([...wordBank]);
-    setAllRounds(shuffledRounds);
+    setAllRounds(buildLevels(wordBank));
     setCurrentLevel(0);
+    setSentenceIndex(0);
+    setWon(false);
     setScore(0);
     setLives(3);
     setGameState(GameState.Playing);
@@ -87,6 +115,7 @@ const App: React.FC = () => {
       setCurrentLevel(savedGame.currentLevel);
       setScore(savedGame.score);
       setLives(savedGame.lives);
+      setSentenceIndex(savedGame.sentenceIndex ?? 0);
       setGameState(savedGame.gameState);
       setSavedGame(null);
     }
@@ -96,7 +125,8 @@ const App: React.FC = () => {
     if (currentLevel < TOTAL_LEVELS - 1) {
       setGameState(GameState.LevelTransition);
     } else {
-      setGameState(GameState.GameOver); // Game won
+      setWon(true);
+      setGameState(GameState.GameOver);
     }
   }, [currentLevel]);
   
@@ -106,11 +136,12 @@ const App: React.FC = () => {
 
   const startNextLevel = useCallback(() => {
     setCurrentLevel(prev => prev + 1);
+    setSentenceIndex(0);
     setGameState(GameState.Playing);
   }, []);
 
   const handleCorrectAnswer = useCallback(() => {
-    setScore(prev => prev + 10);
+    setScore(prev => prev + POINTS_PER_SENTENCE);
   }, []);
   
   const handleIncorrectAnswer = useCallback(() => {
@@ -131,6 +162,8 @@ const App: React.FC = () => {
             key={currentLevel}
             level={currentLevel + 1}
             sentences={allRounds.slice(currentLevel * SENTENCES_PER_LEVEL, (currentLevel + 1) * SENTENCES_PER_LEVEL)}
+            initialSentenceIndex={sentenceIndex}
+            onRoundResolved={setSentenceIndex}
             score={score}
             lives={lives}
             onLevelComplete={handleLevelComplete}
@@ -148,7 +181,7 @@ const App: React.FC = () => {
           />
         );
       case GameState.GameOver:
-        return <GameOverScreen score={score} onRestart={startGame} won={lives > 0 && currentLevel >= TOTAL_LEVELS - 1} />;
+        return <GameOverScreen score={score} onRestart={startGame} won={won} maxScore={MAX_SCORE} />;
       case GameState.Start:
       default:
         return (

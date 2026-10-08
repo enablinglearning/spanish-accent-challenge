@@ -19,7 +19,7 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart, onResume, hasSavedGa
         </h1>
       </div>
       <p className="text-lg md:text-xl text-slate-300 max-w-xl mx-auto mb-8">
-        ¡Pon a prueba tus habilidades con los acentos en español! Lee la frase, encuentra las palabras que necesitan tilde y haz clic en la vocal correcta.
+        ¡Pon a prueba tu dominio de las tildes en español! Lee la frase, encuentra las palabras que necesitan tilde y haz clic en la vocal correcta.
       </p>
 
       {highScore > 0 && (
@@ -33,12 +33,12 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart, onResume, hasSavedGa
       )}
 
       <div className="bg-slate-900/50 rounded-lg p-6 mb-8 border border-slate-700">
-        <h2 className="text-2xl font-semibold text-sky-400 mb-4 flex items-center justify-center gap-2"><AcademicCapIcon className="w-6 h-6"/> Cómo Jugar</h2>
+        <h2 className="text-2xl font-semibold text-sky-400 mb-4 flex items-center justify-center gap-2"><AcademicCapIcon className="w-6 h-6"/> Cómo jugar</h2>
         <ol className="text-left list-decimal list-inside text-slate-400 space-y-2">
-          <li>El juego consta de 6 niveles, con 10 frases únicas en cada uno.</li>
+          <li>El juego tiene 6 niveles, con 10 frases distintas en cada uno.</li>
           <li>Haz clic en la palabra que crees que debe llevar la tilde.</li>
           <li>Luego, haz clic en la vocal correcta para acentuarla.</li>
-          <li>Tienes 3 intentos para resolver cada frase. En tu último intento, la palabra correcta parpadeará como pista.</li>
+          <li>Tienes 3 intentos para resolver cada frase. En tu último intento, las palabras que faltan parpadearán como pista.</li>
           <li>Si agotas los 3 intentos, perderás una de tus 3 vidas. ¡Concéntrate para alcanzar la puntuación máxima (600 puntos)!</li>
         </ol>
       </div>
@@ -48,14 +48,14 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStart, onResume, hasSavedGa
             onClick={onResume}
             className="w-full sm:w-auto px-8 py-4 bg-green-600 text-white font-bold text-xl rounded-lg hover:bg-green-500 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-green-600/30"
           >
-            Continuar Partida
+            Continuar partida
           </button>
         )}
         <button
           onClick={onStart}
           className="w-full sm:w-auto px-8 py-4 bg-sky-600 text-white font-bold text-xl rounded-lg hover:bg-sky-500 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-sky-600/30"
         >
-          {hasSavedGame ? 'Empezar Nueva Partida' : 'Empezar a Jugar'}
+          {hasSavedGame ? 'Empezar nueva partida' : 'Empezar a jugar'}
         </button>
       </div>
       <Attribution showBTLPTLink={true} className="mt-8 pt-6 border-t border-slate-700/50" />

@@ -6,17 +6,16 @@ interface GameOverScreenProps {
   score: number;
   onRestart: () => void;
   won: boolean;
+  maxScore: number;
 }
 
-const MAX_SCORE = 600;
-
-const GameOverScreen: React.FC<GameOverScreenProps> = ({ score, onRestart, won }) => {
+const GameOverScreen: React.FC<GameOverScreenProps> = ({ score, onRestart, won, maxScore }) => {
 
   const getWinMessage = () => {
-    if (score === MAX_SCORE) {
-      return "¡Dominio total! Has contestado todas las preguntas y alcanzado la puntuación máxima.";
+    if (score === maxScore) {
+      return "¡Dominio total! Acertaste todas las frases y alcanzaste la puntuación máxima.";
     }
-    return "¡Completaste todos los niveles! Juega de nuevo para intentar alcanzar el 'Dominio Total' y la puntuación máxima.";
+    return "¡Completaste todos los niveles! Vuelve a jugar para intentar alcanzar el “dominio total” y la puntuación máxima.";
   };
   
   const titleGradient = won 
@@ -30,7 +29,7 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({ score, onRestart, won }
   return (
     <div className={`text-center bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 md:p-12 shadow-2xl border ${containerBorder}`}>
        <h1 className={`text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r ${titleGradient} mb-4`}>
-        {won ? '¡Felicidades!' : '¡Juego Terminado!'}
+        {won ? '¡Felicidades!' : '¡Juego terminado!'}
       </h1>
       {won && (
         <p className="text-lg text-slate-300 mb-2 max-w-lg mx-auto">
@@ -47,7 +46,7 @@ const GameOverScreen: React.FC<GameOverScreenProps> = ({ score, onRestart, won }
         className="px-8 py-4 bg-sky-600 text-white font-bold text-xl rounded-lg hover:bg-sky-500 transition-all duration-300 transform hover:scale-105 shadow-lg shadow-sky-600/30 flex items-center justify-center gap-2 mx-auto mb-6"
       >
         <RefreshIcon className="w-6 h-6"/>
-        Jugar de Nuevo
+        Jugar de nuevo
       </button>
       <Attribution showBTLPTLink={true} className="mt-6 pt-6 border-t border-slate-700/50" />
     </div>
